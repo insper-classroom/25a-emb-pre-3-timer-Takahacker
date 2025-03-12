@@ -7,7 +7,6 @@ const int BTN_PIN_R = 28;
 const int LED_PIN_R = 4;
 
 volatile int flag_f_r = 0;
-volatile bool led_state = false;
 volatile bool flag_alarm = false;
 volatile bool timer_fired = false;
 
@@ -46,6 +45,8 @@ int main() {
 
     gpio_set_irq_enabled_with_callback(
         BTN_PIN_R, GPIO_IRQ_EDGE_FALL | GPIO_IRQ_EDGE_RISE, true, btn_callback);
+
+    bool led_state = false;
 
     while (true) {
         if (timer_fired) {
