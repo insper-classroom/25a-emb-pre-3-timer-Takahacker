@@ -28,17 +28,11 @@ bool timer_callback_g(struct repeating_timer *t) {
 }
 
 void btn_callback(uint gpio, uint32_t events) {
-    static uint32_t last_interrupt_time = 0;
-    uint32_t interrupt_time = to_ms_since_boot(get_absolute_time());
-
-    if (interrupt_time - last_interrupt_time > 200) { 
-        if (events == 0x4) {
-            if (gpio == BTN_PIN_R)
-                flag_r = 1;
-            else if (gpio == BTN_PIN_G)
-                flag_g = 1;
-        }
-        last_interrupt_time = interrupt_time;
+    if (events == 0x4) {
+        if (gpio == BTN_PIN_R)
+            flag_r = 1;
+        else if (gpio == BTN_PIN_G)
+            flag_g = 1;
     }
 }
 
@@ -89,7 +83,5 @@ int main() {
                 add_repeating_timer_ms(250, timer_callback_g, NULL, &timer_g);
             }
         }
-
-        sleep_ms(10);
     }
 }
