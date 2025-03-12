@@ -1,6 +1,7 @@
 #include "hardware/gpio.h"
 #include "pico/stdlib.h"
 #include <stdio.h>
+#include "hardware/timer.h"
 
 const int BTN_PIN_R = 28;
 const int BTN_PIN_G = 26;
@@ -10,6 +11,21 @@ const int LED_PIN_G = 6;
 
 volatile int flag_r = 0;
 volatile int flag_g = 0;
+
+volatile bool led_r_on = false;
+volatile bool led_g_on = false;
+
+bool timer_callback_r(struct repeating_timer *t) {
+    led_r_on = !led_r_on;
+    gpio_put(LED_PIN_R, led_r_on);
+    return true;
+}
+
+bool timer_callback_g(struct repeating_timer *t) {
+    led_g_on = !led_g_on;
+    gpio_put(LED_PIN_G, led_g_on);
+    return true;
+}
 
 void btn_callback(uint gpio, uint32_t events) {
     if (events == 0x4) {
@@ -39,14 +55,30 @@ int main() {
                                        &btn_callback);
     gpio_set_irq_enabled(BTN_PIN_G, GPIO_IRQ_EDGE_FALL, true);
 
-    while (true) {
+    struct repeating_timer timer_r;
+    struct repeating_timer timer_g;
 
+    while (true) {
         if (flag_r) {
             flag_r = 0;
+            if (led_r_on) {
+                cancel_repeating_timer(&timer_r);
+                gpio_put(LED_PIN_R, false);
+                led_r_on = false;
+            } else {
+                add_repeating_timer_ms(500, timer_callback_r, NULL, &timer_r);
+            }
         }
 
         if (flag_g) {
             flag_g = 0;
+            if (led_g_on) {
+                cancel_repeating_timer(&timer_g);
+                gpio_put(LED_PIN_G, false);
+                led_g_on = false;
+            } else {
+                add_repeating_timer_ms(250, timer_callback_g, NULL, &timer_g);
+            }
         }
     }
 }
