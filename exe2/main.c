@@ -32,13 +32,14 @@ void btn_callback(uint gpio, uint32_t events) {
     uint32_t interrupt_time = to_ms_since_boot(get_absolute_time());
 
     if (interrupt_time - last_interrupt_time > 200) { 
+        if (events == 0x4) {
             if (gpio == BTN_PIN_R)
                 flag_r = 1;
             else if (gpio == BTN_PIN_G)
                 flag_g = 1;
         }
+        last_interrupt_time = interrupt_time;
     }
-    last_interrupt_time = interrupt_time;
 }
 
 int main() {
