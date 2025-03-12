@@ -39,9 +39,11 @@ void btn_callback(uint gpio, uint32_t events) {
 int main() {
     gpio_init(LED_PIN_R);
     gpio_set_dir(LED_PIN_R, GPIO_OUT);
+    gpio_put(LED_PIN_R, false);
 
     gpio_init(LED_PIN_G);
     gpio_set_dir(LED_PIN_G, GPIO_OUT);
+    gpio_put(LED_PIN_G, false);
 
     gpio_init(BTN_PIN_R);
     gpio_set_dir(BTN_PIN_R, GPIO_IN);
@@ -53,7 +55,8 @@ int main() {
 
     gpio_set_irq_enabled_with_callback(BTN_PIN_R, GPIO_IRQ_EDGE_FALL, true,
                                        &btn_callback);
-    gpio_set_irq_enabled(BTN_PIN_G, GPIO_IRQ_EDGE_FALL, true);
+    gpio_set_irq_enabled_with_callback(BTN_PIN_G, GPIO_IRQ_EDGE_FALL, true,
+                                       &btn_callback);
 
     struct repeating_timer timer_r;
     struct repeating_timer timer_g;
